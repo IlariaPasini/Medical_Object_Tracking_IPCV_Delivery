@@ -8,7 +8,7 @@ import numpy as np
 import time
 import cv2
 import av
-import hl2ss
+import dependencies.hl2ss as hl2ss
 import hl2ss_mp
 import hl2ss_lnm
 import hl2ss_io

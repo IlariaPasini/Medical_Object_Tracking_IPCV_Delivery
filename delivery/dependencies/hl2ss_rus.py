@@ -1,6 +1,6 @@
 
 import struct
-import hl2ss
+import dependencies.hl2ss as hl2ss
 
 
 # 3D Primitive Types

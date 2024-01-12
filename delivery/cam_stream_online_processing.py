@@ -9,7 +9,7 @@ import multiprocessing as mp
 import numpy as np
 import cv2
 import dependencies.hl2ss_imshow as hl2ss_imshow
-import hl2ss
+import dependencies.hl2ss as hl2ss
 import dependencies.hl2ss_lnm as hl2ss_lnm
 import dependencies.hl2ss_mp as hl2ss_mp
 import utilities.blobDetection as sgt
@@ -17,16 +17,16 @@ import utilities.blobDetection as sgt
 # Settings --------------------------------------------------------------------
 
 # HoloLens address
-host = '169.254.50.241' #'169.254.58.146' 
+host = '169.254.58.146' #'169.254.50.241' 
 
 # Ports
 ports = [
-    hl2ss.StreamPort.RM_VLC_LEFTFRONT,
+    #hl2ss.StreamPort.RM_VLC_LEFTFRONT,
     #hl2ss.StreamPort.RM_VLC_LEFTLEFT,
-    hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
+    #hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
     #hl2ss.StreamPort.RM_VLC_RIGHTRIGHT,
     #hl2ss.StreamPort.RM_DEPTH_AHAT,
-    hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
+    #hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
     hl2ss.StreamPort.PERSONAL_VIDEO,
     #hl2ss.StreamPort.RM_IMU_ACCELEROMETER,
     #hl2ss.StreamPort.RM_IMU_GYROSCOPE,
@@ -49,6 +49,9 @@ lt_framerate = 5
 
 # Maximum number of frames in buffer
 buffer_elements = 150
+
+# Current keypoints
+keypoints = None
 
 #------------------------------------------------------------------------------
 
@@ -145,10 +148,10 @@ if __name__ == '__main__':
 
     # Store -------------------------------------------------------------------
     #cambiare path se serve
-    pv_path = 'C:/Users/marti/Desktop/Poli/Image Processing and Computer Vision/Progetto/hl2ss-computer-vision-class/viewer/output/stereo/alongZ/pv/'
-    lf_path = 'C:/Users/marti/Desktop/Poli/Image Processing and Computer Vision/Progetto/hl2ss-computer-vision-class/viewer/output/stereo/alongZ/lf/'
-    rf_path = 'C:/Users/marti/Desktop/Poli/Image Processing and Computer Vision/Progetto/hl2ss-computer-vision-class/viewer/output/stereo/alongZ/rf/'
-    lt_path = 'C:/Users/marti/Desktop/Poli/Image Processing and Computer Vision/Progetto/hl2ss-computer-vision-class/viewer/output/stereo/alongZ/lt/'
+    pv_path = 'YOUR PATH/sample/pv'
+    lf_path = 'YOUR PATH/sample/lf'
+    rf_path = 'YOUR PATH/sample/rf'
+    lt_path = 'YOUR PATH/sample/lt'
 
     def store_pv(port, payload, c):
         if (payload.image is not None and payload.image.size > 0):
@@ -190,18 +193,42 @@ if __name__ == '__main__':
 
     def cv_rf(port, payload):
         pass
-
+   
     def cv_pv(port, payload):
+        """
+        Compute blob detection for personal video camera and display frame
+        
+        TIPS:
+        works better with applyColored=True
+        """
+        
         if (payload.image is not None and payload.image.size > 0):
-            res = sgt.Blob.FindCirclesFine(payload.image, applyMorph=True, blobMethod = sgt.Blob.Config.SIMPLE_BLOB)
+            res, circles = sgt.Blob.FindCirclesFine(payload.image, applyColored = True, blobMethod = sgt.Blob.Config.SIMPLE_BLOB)
             cv2.imshow(hl2ss.get_port_name(port), res)
-            
+        
     def cv_lt(port, payload):
-        #displays long throw depth
+        """
+        Compute blob detection for Long Throw and AB cameras and display frame
+        
+        TIPS:
+        works better with applyColored=False
+        """
         if (payload.depth is not None and payload.depth.size > 0):
             cv2.imshow(hl2ss.get_port_name(port) + '-depth', payload.depth * 8) # Scaled for visibility
             
     def cv_ah(port, payload):
+        """
+        Compute blob detection for AHAT and AB cameras and display frame
+        
+        TIPS:
+        works better with applyColored=False
+        """
+        
+        if (payload.ab is not None and payload.ab.size > 0):
+            #the image passes is converted in order to be used by the find circle function
+            res, circles = sgt.Blob.FindCirclesFine(cv2.convertScaleAbs(payload.ab), applyColored = False, blobMethod = sgt.Blob.Config.SIMPLE_BLOB)
+            cv2.imshow(hl2ss.get_port_name(port) + '-ab', res)
+        
         if (payload.depth is not None and payload.depth.size > 0):
             cv2.imshow(hl2ss.get_port_name(port) + '-depth', payload.depth * 64) # Scaled for visibility
         #if (payload.ab is not None and payload.ab.size > 0):
@@ -222,8 +249,11 @@ if __name__ == '__main__':
         for port in ports:
             _, data = sinks[port].get_most_recent_frame()
             if (data is not None):
-                DISPLAY_MAP[port](port, data.payload)
-                #CV_MAP[port](port, data.payload)
+                
+                #these methods have to be commented and not commented in order to do the operation that you prefer
+                
+                #DISPLAY_MAP[port](port, data.payload)
+                CV_MAP[port](port, data.payload)
                 #STORE_MAP[port](port, data.payload,counter)
         counter += 1
         cv2.waitKey(1)

@@ -3,7 +3,7 @@ import multiprocessing as mp
 import threading
 import numpy as np
 import open3d as o3d
-import hl2ss
+import dependencies.hl2ss as hl2ss
 import hl2ss_lnm
 import hl2ss_3dcv
 

@@ -1,7 +1,7 @@
 
 import struct
 import types
-import hl2ss
+import dependencies.hl2ss as hl2ss
 
 
 _MAGIC = 'HL2SSV23'
