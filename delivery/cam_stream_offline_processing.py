@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-import Project.segmentation as sgt
+import utilities.segmentation as sgt
 
 # Path to the folder containing your images
 image_folder = 'Project/Colored_frames'

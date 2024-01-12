@@ -8,11 +8,11 @@ from pynput import keyboard
 import multiprocessing as mp
 import numpy as np
 import cv2
-import hl2ss_imshow
+import dependencies.hl2ss_imshow as hl2ss_imshow
 import hl2ss
-import hl2ss_lnm
-import hl2ss_mp
-import output.Project.segmentation as sgt
+import dependencies.hl2ss_lnm as hl2ss_lnm
+import dependencies.hl2ss_mp as hl2ss_mp
+import utilities.blobDetection as sgt
 
 # Settings --------------------------------------------------------------------
 
@@ -224,7 +224,7 @@ if __name__ == '__main__':
             if (data is not None):
                 DISPLAY_MAP[port](port, data.payload)
                 #CV_MAP[port](port, data.payload)
-                STORE_MAP[port](port, data.payload,counter)
+                #STORE_MAP[port](port, data.payload,counter)
         counter += 1
         cv2.waitKey(1)
 
