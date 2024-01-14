@@ -130,7 +130,7 @@ if __name__ == '__main__':
     def display_null(port, payload):
         pass
 
-    DISPLAY_MAP = {
+    DISPLAY_MAP = { # callbacks to display video stream
         hl2ss.StreamPort.RM_VLC_LEFTFRONT     : display_basic,
         hl2ss.StreamPort.RM_VLC_LEFTLEFT      : display_basic,
         hl2ss.StreamPort.RM_VLC_RIGHTFRONT    : display_basic,
@@ -147,11 +147,11 @@ if __name__ == '__main__':
     }
 
     # Store -------------------------------------------------------------------
-    #cambiare path se serve
-    pv_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/pv/'
-    lf_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/lf/'
-    rf_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/rf/'
-    lt_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/lt/'
+    # path to store camera stream for offline processing
+    pv_path = ''
+    lf_path = ''
+    rf_path = ''
+    lt_path = ''
 
     def store_pv(port, payload, c):
         if (payload.image is not None and payload.image.size > 0):
@@ -162,26 +162,26 @@ if __name__ == '__main__':
 
     def store_lf(port, payload, c):
         if (payload is not None and payload.size > 0):
-            # store rf & lf image
+            # store lf image
             filename = f"lf_frame{c}.png"
             cv2.imwrite(lf_path + filename, payload) 
             pass
 
     def store_rf(port, payload, c):
         if (payload is not None and payload.size > 0):
-            # store rf & lf image
+            # store rf image
             filename = f"rf_frame{c}.png"
             cv2.imwrite(rf_path + filename, payload) 
             pass
         
     def store_lt(port, payload, c):
         if (payload.depth is not None and payload.depth.size > 0):
-            # store rf & lf image
+            # store lt image
             filename = f"lt_frame{c}.png"
             cv2.imwrite(lt_path + filename, payload.depth * 8) 
             pass
 
-    STORE_MAP = {
+    STORE_MAP = { # image sequence store callbacks for video streams.
         hl2ss.StreamPort.RM_VLC_LEFTFRONT     : store_lf,
         hl2ss.StreamPort.RM_VLC_RIGHTFRONT    : store_rf,
         hl2ss.StreamPort.PERSONAL_VIDEO       : store_pv,
@@ -207,12 +207,7 @@ if __name__ == '__main__':
             cv2.imshow(hl2ss.get_port_name(port), res)
         
     def cv_lt(port, payload):
-        """
-        Compute blob detection for Long Throw and AB cameras and display frame
-        
-        TIPS:
-        works better with applyColored=False
-        """
+        # right now just display long throw
         if (payload.depth is not None and payload.depth.size > 0):
             cv2.imshow(hl2ss.get_port_name(port) + '-depth', payload.depth * 8) # Scaled for visibility
             
@@ -221,7 +216,7 @@ if __name__ == '__main__':
         Compute blob detection for AHAT and AB cameras and display frame
         
         TIPS:
-        works better with applyColored=False
+        works best with applyColored=False
         """
         
         if (payload.ab is not None and payload.ab.size > 0):
@@ -234,13 +229,13 @@ if __name__ == '__main__':
         #if (payload.ab is not None and payload.ab.size > 0):
         #   cv2.imshow(hl2ss.get_port_name(port) + '-ab', payload.ab)
 
-    CV_MAP = {
+
+    CV_MAP = { # computer vision processing callbacks for video streams.
         hl2ss.StreamPort.RM_VLC_LEFTFRONT     : cv_lf,
         hl2ss.StreamPort.RM_VLC_RIGHTFRONT    : cv_rf,
         hl2ss.StreamPort.PERSONAL_VIDEO       : cv_pv,
         hl2ss.StreamPort.RM_DEPTH_LONGTHROW   : cv_lt,
         hl2ss.StreamPort.RM_DEPTH_AHAT        : cv_ah
-        
     }
 
     # Main loop ---------------------------------------------------------------
@@ -249,12 +244,11 @@ if __name__ == '__main__':
         for port in ports:
             _, data = sinks[port].get_most_recent_frame()
             if (data is not None):
+                # these methods have to be commented and not commented in order to do the operation that you prefer
                 
-                #these methods have to be commented and not commented in order to do the operation that you prefer
-                
-                #DISPLAY_MAP[port](port, data.payload)
-                CV_MAP[port](port, data.payload)
-                STORE_MAP[port](port, data.payload,counter)
+                DISPLAY_MAP[port](port, data.payload)
+                #CV_MAP[port](port, data.payload)
+                #STORE_MAP[port](port, data.payload,counter)
         counter += 1
         cv2.waitKey(1)
 
