@@ -14,7 +14,7 @@ class Blob:
         CANNY = 2,
         SOBEL = 3
     
-    # ========= HOUGHCIRCLE CONFIGURATION ========= #
+    # ========= PREPROCESS CONFIGURATION ========= #
     # Gaussian blur kernel
     sm_kernel_size = 3 # (3,9,15,...3*k) -> valore precedente 3
     

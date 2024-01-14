@@ -21,12 +21,12 @@ host = '169.254.58.146' #'169.254.50.241'
 
 # Ports
 ports = [
-    #hl2ss.StreamPort.RM_VLC_LEFTFRONT,
+    hl2ss.StreamPort.RM_VLC_LEFTFRONT,
     #hl2ss.StreamPort.RM_VLC_LEFTLEFT,
-    #hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
+    hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
     #hl2ss.StreamPort.RM_VLC_RIGHTRIGHT,
     #hl2ss.StreamPort.RM_DEPTH_AHAT,
-    #hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
+    hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
     hl2ss.StreamPort.PERSONAL_VIDEO,
     #hl2ss.StreamPort.RM_IMU_ACCELEROMETER,
     #hl2ss.StreamPort.RM_IMU_GYROSCOPE,
@@ -148,10 +148,10 @@ if __name__ == '__main__':
 
     # Store -------------------------------------------------------------------
     #cambiare path se serve
-    pv_path = 'YOUR PATH/sample/pv'
-    lf_path = 'YOUR PATH/sample/lf'
-    rf_path = 'YOUR PATH/sample/rf'
-    lt_path = 'YOUR PATH/sample/lt'
+    pv_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/pv/'
+    lf_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/lf/'
+    rf_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/rf/'
+    lt_path = 'C:/Users/ilari/Desktop/ProgettoIPVC/hl2ssCorretto/Medical_Object_Tracking_IPCV_Delivery/delivery/samples/lt/'
 
     def store_pv(port, payload, c):
         if (payload.image is not None and payload.image.size > 0):
@@ -254,7 +254,7 @@ if __name__ == '__main__':
                 
                 #DISPLAY_MAP[port](port, data.payload)
                 CV_MAP[port](port, data.payload)
-                #STORE_MAP[port](port, data.payload,counter)
+                STORE_MAP[port](port, data.payload,counter)
         counter += 1
         cv2.waitKey(1)
 
