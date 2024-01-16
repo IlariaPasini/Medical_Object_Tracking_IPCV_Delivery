@@ -21,12 +21,12 @@ host = '169.254.58.146' #'169.254.50.241'
 
 # Ports
 ports = [
-    hl2ss.StreamPort.RM_VLC_LEFTFRONT,
+    #hl2ss.StreamPort.RM_VLC_LEFTFRONT,
     #hl2ss.StreamPort.RM_VLC_LEFTLEFT,
-    hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
+    #hl2ss.StreamPort.RM_VLC_RIGHTFRONT,
     #hl2ss.StreamPort.RM_VLC_RIGHTRIGHT,
     #hl2ss.StreamPort.RM_DEPTH_AHAT,
-    hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
+    #hl2ss.StreamPort.RM_DEPTH_LONGTHROW,
     hl2ss.StreamPort.PERSONAL_VIDEO,
     #hl2ss.StreamPort.RM_IMU_ACCELEROMETER,
     #hl2ss.StreamPort.RM_IMU_GYROSCOPE,
@@ -34,7 +34,7 @@ ports = [
     #hl2ss.StreamPort.MICROPHONE,
     #hl2ss.StreamPort.SPATIAL_INPUT,
     #hl2ss.StreamPort.EXTENDED_EYE_TRACKER,
-    ]
+]
 
 # PV parameters
 pv_width     = 760
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         if (payload.depth is not None and payload.depth.size > 0):
             cv2.imshow(hl2ss.get_port_name(port) + '-depth', payload.depth * 64) # Scaled for visibility
         if (payload.ab is not None and payload.ab.size > 0):
-            cv2.imshow(hl2ss.get_port_name(port) + '-ab', payload.ab)
+            cv2.imshow(hl2ss.get_port_name(port) + '-ab', payload.ab / np.max(payload.ab))
 
     def display_null(port, payload):
         pass
@@ -221,7 +221,7 @@ if __name__ == '__main__':
         
         if (payload.ab is not None and payload.ab.size > 0):
             #the image passes is converted in order to be used by the find circle function
-            res, circles = sgt.Blob.FindCirclesFine(cv2.convertScaleAbs(payload.ab), applyColored = False, blobMethod = sgt.Blob.Config.SIMPLE_BLOB)
+            res, circles = sgt.Blob.FindCirclesFine(cv2.convertScaleAbs(payload.ab), applyColored = False, applyBlur=True, applyEdge=True, applyMorph=True, applyThresh=True, blobMethod = sgt.Blob.Config.SIMPLE_BLOB)
             cv2.imshow(hl2ss.get_port_name(port) + '-ab', res)
         
         if (payload.depth is not None and payload.depth.size > 0):
@@ -246,8 +246,8 @@ if __name__ == '__main__':
             if (data is not None):
                 # these methods have to be commented and not commented in order to do the operation that you prefer
                 
-                DISPLAY_MAP[port](port, data.payload)
-                #CV_MAP[port](port, data.payload)
+                #DISPLAY_MAP[port](port, data.payload)
+                CV_MAP[port](port, data.payload)
                 #STORE_MAP[port](port, data.payload,counter)
         counter += 1
         cv2.waitKey(1)
